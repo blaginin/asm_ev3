@@ -2,6 +2,38 @@ import serial
 import time
 from ev import ev
 import os
+import ev3.ev3dev ad ev3dev
+
+color = ev3dev.LegoSensor(port=4)
+color.mode = 'COL-COLOR'
+N_COLORS = 10
+N_COLORS_STOP = 0.9
+
+m_mark = {"N":1, "M":5, "G":2, "P":3, "S":4}
+
+def navigate(x, motors, speed):
+    x = m_mark[x]
+
+    for motor in motors:
+        motor.write_value('estop', '0')
+        motor.write_value('reset', '1')
+        motor.run_forever(speed_sp=speed)
+
+    colorarray = []
+
+    while True:
+        pp = color.value0
+        colorarray.append(pp)
+        if len(colorarray) < N_COLORS: continue
+        del(colorarray[0])
+
+        if colorarray.count(x)/N_COLORS >= N_COLORS_STOP:
+            print('COLOR DONE')
+            for motor in motors: motor.write_value('stop_mode', 'hold')
+            return
+        print('NO', colorarray)
+
+        
 
 
 def insideinit():
