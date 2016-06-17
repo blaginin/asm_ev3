@@ -46,7 +46,7 @@ insideinit()
 allm = [B, C, D]
 #42-35
 USE_SP = 3
-
+LUCK = D
 
 
 color.mode = 'COL-COLOR'
@@ -61,6 +61,12 @@ def run(speed, motors):
         motor.write_value('estop', '0')
         motor.write_value('reset', '1')
         motor.run_forever(speed_sp=speed)
+
+
+def push():
+    for i in range(4*2):
+        direct(90 +  (-180)*((i+1)%2), [LUCK], NNIUD=0.4)
+        time.sleep(0.5)
 
 def navigate(x, motors, speed):
     x = m_mark[x]
@@ -78,9 +84,7 @@ def navigate(x, motors, speed):
                 motor.stop()
             direct(-80, [CLAW_MOTOR])
             run(0, [CLAW_MOTOR])
-            for i in range(4*2):
-                direct(90 +  (-180)*((i+1)%2), [D], NNIUD=0.4)
-                time.sleep(0.5)
+            push()
             run(-speed, motors)
             while not button.value0: pass
             for motor in motors: motor.stop()
@@ -158,6 +162,10 @@ while True:
     if msg.startswith('NAVIGATE'):
         print('NAVIG', msg)
         cmd = msg.split('_')
+        if cmd[1] == 'NONE': 
+            push()
+            continue
+
         q = []
         for i in cmd[2]: q.append(eval(i))
         navigate(cmd[1], q, int(cmd[3]) )
