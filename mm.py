@@ -80,7 +80,7 @@ def navigate(x, motors, speed):
             direct(-80, [CLAW_MOTOR])
 
             for i in range(4*2):
-                direct(90 +  (-180)*((i+1)%2), [D])
+                direct(90 +  (-180)*((i+1)%2), [D], NNIUD=0.4)
                 time.sleep(0.5)
 
             run(-speed, motors)
@@ -99,7 +99,7 @@ def deviation_list(lst):
 
 
 
-def direct(speed, motors):
+def direct(speed, motors, NNIUD=1):
     hh = [[] for i in range(len(motors))]
     stopn = 0
     print("DIRECT MOTORS", motors)
@@ -116,7 +116,7 @@ def direct(speed, motors):
             if len(hh[ind]) > USE_SP:
                 del(hh[ind][0])
                 ans = deviation_list(hh[ind])
-                if sum(ans) / len(ans) < 1: 
+                if sum(ans) / len(ans) < NNIUD: 
                      motor.write_value('stop_mode', 'hold')
                      motors[ind] = None
                      stopn += 1
