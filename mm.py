@@ -62,6 +62,10 @@ def insideinit():
     C.position = 0
     D.position = 0
 
+
+insideinit()
+
+
 #for a in letters:
 #    eval('MOTORS_'+a+" = ev(port='"+a+"')")
  #   eval('\tMOTORS_'+a+'.absolute = True')
@@ -76,7 +80,6 @@ def insideinit():
 
 allm = [B, C, D]
 #42-35
-insideinit()
 USE_SP = 3
 
 def deviation_list(lst):
