@@ -8,44 +8,7 @@ import sys
 color = ev3dev.LegoSensor(port=4)
 button = ev3dev.LegoSensor(port=3)
 
-color.mode = 'COL-COLOR'
-N_COLORS = 10
-N_COLORS_STOP = 0.9
 
-m_mark = {"N":1, "M":5, "G":2, "P":3, "S":4}
-
-
-def run(speed, motors):
-    for motor in motors:
-        motor.write_value('estop', '0')
-        motor.write_value('reset', '1')
-        motor.run_forever(speed_sp=speed)
-
-def navigate(x, motors, speed):
-    x = m_mark[x]
-    run(speed, motors)
-    colorarray = []
-    while True:
-        pp = color.value0
-        colorarray.append(pp)
-        if len(colorarray) < N_COLORS: continue
-        del(colorarray[0])
-        if colorarray.count(x)/N_COLORS >= N_COLORS_STOP:
-            print('COLOR DONE')
-            for motor in motors:
-                motor.write_value('stop_mode', 'hold')
-                motor.stop()
-            for i in range(10*2):
-                direct(90 +  (-180)*((i+1)%2), [D])
-                time.sleep(0.5)
-
-            run(-speed, motors)
-            while not button.value0: pass
-            for motor in motors: motor.stop()
-            return
-        print('NO', colorarray)
-
-        
 
 
 def insideinit():
@@ -83,6 +46,52 @@ insideinit()
 allm = [B, C, D]
 #42-35
 USE_SP = 3
+
+
+
+color.mode = 'COL-COLOR'
+N_COLORS = 10
+N_COLORS_STOP = 0.9
+CLAW_MOTOR = C
+m_mark = {"N":1, "M":5, "G":2, "P":3, "S":4}
+
+
+def run(speed, motors):
+    for motor in motors:
+        motor.write_value('estop', '0')
+        motor.write_value('reset', '1')
+        motor.run_forever(speed_sp=speed)
+
+def navigate(x, motors, speed):
+    x = m_mark[x]
+    run(speed, motors)
+    colorarray = []
+    while True:
+        pp = color.value0
+        colorarray.append(pp)
+        if len(colorarray) < N_COLORS: continue
+        del(colorarray[0])
+        if colorarray.count(x)/N_COLORS >= N_COLORS_STOP:
+            print('COLOR DONE')
+            for motor in motors:
+                motor.write_value('stop_mode', 'hold')
+                motor.stop()
+
+            direct(speed, [CLAW_MOTOR])
+            
+            for i in range(10*2):
+                direct(90 +  (-180)*((i+1)%2), [D])
+                time.sleep(0.5)
+
+            run(-speed, motors)
+            while not button.value0: pass
+            for motor in motors: motor.stop()
+            return
+        print('NO', colorarray)
+
+        
+
+
 
 def deviation_list(lst):
     average = sum(lst)/len(lst)
@@ -125,62 +134,71 @@ def readlineCR(port):
             return rv
 
 
-navigate("N", [A, B], 50)
+#navigate("N", [A, B], 50)
 
-# port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
+port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
 
-# print('START LISTEN')
-# while True:
-#     msg = readlineCR(port).strip().upper()
+print('START LISTEN')
+while True:
+    msg = readlineCR(port).strip().upper()
 
-#     if len(msg) == 0: continue
+    if len(msg) == 0: continue
 
-#     if msg == 'PING':
-#        port.write(bytes(msg+'_PONG', encoding='ascii'))
+    if msg == 'PING':
+       port.write(bytes(msg+'_PONG', encoding='ascii'))
 
-#     if msg.startswith('FREE'):
-#         print('FREE', msg)
-#        # os.system('sudo bash /home/mstop.sh')
-#         motor = eval(msg.split('_')[1])
-#         motor.write_value('estop', '1')
-#         #motor.stop()
+    if msg.startswith('FREE'):
+        print('FREE', msg)
+       # os.system('sudo bash /home/mstop.sh')
+        motor = eval(msg.split('_')[1])
+        motor.write_value('estop', '1')
+        #motor.stop()
 	
-#         continue
+        continue
 
-#     if msg == 'INIT':
-#         insideinit()
-#         direct(50, allm.copy())
+    if msg.startswith('NAVIGATE'):
+        print('NAVIG', msg)
+        cmd = msg.split('_')
+        q = []
+        for i in cmd[2]: q.append(eval(i))
+        navigate(cmd[1], q, int(cmd[3]) )
+        port.write(bytes(msg+'_OK', encoding='ascii'))
 
-#   #      for motor in allm: motor.write_value('estop', '0')
-#         print('INIT DONE')
-#         continue
+
+    if msg == 'INIT':
+        insideinit()
+        direct(50, allm.copy())
+
+  #      for motor in allm: motor.write_value('estop', '0')
+        print('INIT DONE')
+        continue
  
-#     rcv = msg.split('_')
-#     print(rcv)
+    rcv = msg.split('_')
+    print(rcv)
 
  
 
-#     if rcv[0].startswith('MR'):
-#         XY = []
-#         for i in rcv[0][2:]:
-#             XY.append(eval(i))
+    if rcv[0].startswith('MR'):
+        XY = []
+        for i in rcv[0][2:]:
+            XY.append(eval(i))
 
-#         try:
-#             speed = -int(rcv[1])
-#         except BaseException as e:
-#             port.write(bytes(msg+'_ERR', encoding='ascii'))
-#             print('err 0', e)
-#             continue
+        try:
+            speed = -int(rcv[1])
+        except BaseException as e:
+            port.write(bytes(msg+'_ERR', encoding='ascii'))
+            print('err 0', e)
+            continue
 
 
-#      #   print('MRAB', MOTORS_A)
-#         direct(speed, XY)
-#         #direct(-speed, MOTORS_B)
-#         port.write(bytes(msg+'_SLEEP', encoding='ascii'))
-#        # print(msg+'_SLEEP')
-#         #
+     #   print('MRAB', MOTORS_A)
+        direct(speed, XY)
+        #direct(-speed, MOTORS_B)
+        port.write(bytes(msg+'_SLEEP', encoding='ascii'))
+       # print(msg+'_SLEEP')
+        #
 
-# #time.sleep(3)
-#        # direct(-speed, MOTORS_A)
-#         print(msg+'_OK')
-#         port.write(bytes(msg+'_OK', encoding='ascii'))
+#time.sleep(3)
+       # direct(-speed, MOTORS_A)
+        print(msg+'_OK')
+        port.write(bytes(msg+'_OK', encoding='ascii'))
