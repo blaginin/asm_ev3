@@ -77,7 +77,7 @@ def navigate(x, motors, speed):
                 motor.write_value('stop_mode', 'hold')
                 motor.stop()
 
-            direct(80, [CLAW_MOTOR])
+            direct(-80, [CLAW_MOTOR])
 
             for i in range(4*2):
                 direct(90 +  (-180)*((i+1)%2), [D])
