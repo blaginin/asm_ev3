@@ -2,7 +2,7 @@ import serial
 import time
 from ev import ev
 import os
-import ev3.ev3dev ad ev3dev
+import ev3.ev3dev as ev3dev
 
 color = ev3dev.LegoSensor(port=4)
 color.mode = 'COL-COLOR'
