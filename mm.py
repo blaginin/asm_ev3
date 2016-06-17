@@ -37,7 +37,7 @@ def navigate(x, motors, speed):
                 motor.write_value('stop_mode', 'hold')
                 motor.stop()
             for i in range(3*2): direct(50 +  (-100)*((i+1)%2), [D])
-            run(-speed, motor)
+            run(-speed, motors)
             while not button.value0: pass
             for motor in motors: motor.stop()
             return
