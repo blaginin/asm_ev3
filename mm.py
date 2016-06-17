@@ -3,33 +3,43 @@ import time
 from ev import ev
 import os
 import ev3.ev3dev as ev3dev
+import sys
 
+#+ = close
 color = ev3dev.LegoSensor(port=4)
+button = ev3dev.LegoSensor(port=3)
+
 color.mode = 'COL-COLOR'
 N_COLORS = 10
 N_COLORS_STOP = 0.9
 
 m_mark = {"N":1, "M":5, "G":2, "P":3, "S":4}
 
-def navigate(x, motors, speed):
-    x = m_mark[x]
 
+def run(speed, motors):
     for motor in motors:
         motor.write_value('estop', '0')
         motor.write_value('reset', '1')
         motor.run_forever(speed_sp=speed)
 
+def navigate(x, motors, speed):
+    x = m_mark[x]
+    run(speed, motors)
     colorarray = []
-
     while True:
         pp = color.value0
         colorarray.append(pp)
         if len(colorarray) < N_COLORS: continue
         del(colorarray[0])
-
         if colorarray.count(x)/N_COLORS >= N_COLORS_STOP:
             print('COLOR DONE')
-            for motor in motors: motor.write_value('stop_mode', 'hold')
+            for motor in motors:
+                motor.write_value('stop_mode', 'hold')
+                motor.stop()
+            for i in range(3*2): direct(50 +  (-100)*((i+1)%2), [D])
+            run(-speed, motor)
+            while not button.value0: pass
+            for motor in motors: motor.stop()
             return
         print('NO', colorarray)
 
@@ -43,13 +53,10 @@ def insideinit():
     B = ev(port='B')
     C = ev(port='C')
     D = ev(port='D')
-#MOTORS_A = ev(port='D')
-
     A.absolute = True
     B.absolute = True
     C.absolute = True
     D.absolute = True
-
     A.position = 0
     B.position = 0
     C.position = 0
@@ -67,12 +74,7 @@ def insideinit():
 #AB = [MOTORS_A, MOTORS_B]
 #CD = [MOTORS_C, MOTORS_D]
 
-#A2
-#b5
-#c4
-#d3
-
-    allm = [B, C, D]
+allm = [B, C, D]
 #42-35
 insideinit()
 USE_SP = 3
@@ -96,12 +98,10 @@ def direct(speed, motors):
     while True:
         for ind, motor in enumerate(motors):
             if motor is None: continue
-#            print(hh, ind, motors)
             hh[ind].append(motor.position)
             if len(hh[ind]) > USE_SP:
                 del(hh[ind][0])
                 ans = deviation_list(hh[ind])
-            #print(ans)
                 if sum(ans) / len(ans) < 1: 
                      motor.write_value('stop_mode', 'hold')
                      motors[ind] = None
@@ -119,60 +119,63 @@ def readlineCR(port):
         if ch=='\r' or ch=='':
             return rv
 
-port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
 
-print('START LISTEN')
-while True:
-    msg = readlineCR(port).strip().upper()
+navigate("N", [A, B], 50)
 
-    if len(msg) == 0: continue
+# port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
 
-    if msg == 'PING':
-       port.write(bytes(msg+'_PONG', encoding='ascii'))
+# print('START LISTEN')
+# while True:
+#     msg = readlineCR(port).strip().upper()
 
-    if msg.startswith('FREE'):
-        print('FREE', msg)
-       # os.system('sudo bash /home/mstop.sh')
-        motor = eval(msg.split('_')[1])
-        motor.write_value('estop', '1')
-        #motor.stop()
+#     if len(msg) == 0: continue
+
+#     if msg == 'PING':
+#        port.write(bytes(msg+'_PONG', encoding='ascii'))
+
+#     if msg.startswith('FREE'):
+#         print('FREE', msg)
+#        # os.system('sudo bash /home/mstop.sh')
+#         motor = eval(msg.split('_')[1])
+#         motor.write_value('estop', '1')
+#         #motor.stop()
 	
-        continue
+#         continue
 
-    if msg == 'INIT':
-        insideinit()
-        direct(50, allm.copy())
+#     if msg == 'INIT':
+#         insideinit()
+#         direct(50, allm.copy())
 
-  #      for motor in allm: motor.write_value('estop', '0')
-        print('INIT DONE')
-        continue
+#   #      for motor in allm: motor.write_value('estop', '0')
+#         print('INIT DONE')
+#         continue
  
-    rcv = msg.split('_')
-    print(rcv)
+#     rcv = msg.split('_')
+#     print(rcv)
 
  
 
-    if rcv[0].startswith('MR'):
-        XY = []
-        for i in rcv[0][2:]:
-            XY.append(eval(i))
+#     if rcv[0].startswith('MR'):
+#         XY = []
+#         for i in rcv[0][2:]:
+#             XY.append(eval(i))
 
-        try:
-            speed = -int(rcv[1])
-        except BaseException as e:
-            port.write(bytes(msg+'_ERR', encoding='ascii'))
-            print('err 0', e)
-            continue
+#         try:
+#             speed = -int(rcv[1])
+#         except BaseException as e:
+#             port.write(bytes(msg+'_ERR', encoding='ascii'))
+#             print('err 0', e)
+#             continue
 
 
-     #   print('MRAB', MOTORS_A)
-        direct(speed, XY)
-        #direct(-speed, MOTORS_B)
-        port.write(bytes(msg+'_SLEEP', encoding='ascii'))
-       # print(msg+'_SLEEP')
-        #
+#      #   print('MRAB', MOTORS_A)
+#         direct(speed, XY)
+#         #direct(-speed, MOTORS_B)
+#         port.write(bytes(msg+'_SLEEP', encoding='ascii'))
+#        # print(msg+'_SLEEP')
+#         #
 
-#time.sleep(3)
-       # direct(-speed, MOTORS_A)
-        print(msg+'_OK')
-        port.write(bytes(msg+'_OK', encoding='ascii'))
+# #time.sleep(3)
+#        # direct(-speed, MOTORS_A)
+#         print(msg+'_OK')
+#         port.write(bytes(msg+'_OK', encoding='ascii'))
