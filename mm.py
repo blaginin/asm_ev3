@@ -126,7 +126,7 @@ def readlineCR(port):
     while True:
         ch = port.read()
         ch = ch.decode(encoding='ascii')
-        print(ch)
+        print(ch, end='')
         rv += ch
         if ch=='\r' or ch=='':
             return rv
