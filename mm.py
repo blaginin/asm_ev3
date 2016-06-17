@@ -4,7 +4,6 @@ from ev import ev
 import os
 import ev3.ev3dev as ev3dev
 import sys
-
 #+ = close
 color = ev3dev.LegoSensor(port=4)
 button = ev3dev.LegoSensor(port=3)
@@ -36,7 +35,10 @@ def navigate(x, motors, speed):
             for motor in motors:
                 motor.write_value('stop_mode', 'hold')
                 motor.stop()
-            for i in range(3*2): direct(50 +  (-100)*((i+1)%2), [D])
+            for i in range(10*2):
+                direct(90 +  (-180)*((i+1)%2), [D])
+                time.sleep(0.5)
+
             run(-speed, motors)
             while not button.value0: pass
             for motor in motors: motor.stop()
