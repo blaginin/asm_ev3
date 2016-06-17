@@ -144,7 +144,7 @@ while True:
     if len(msg) == 0: continue
 
     if msg == 'PING':
-       port.write(bytes(msg+'_PONG', encoding='ascii'))
+       port.write(bytes('OK\r', encoding='ascii'))
 
     if msg.startswith('FREE'):
         print('FREE', msg)
@@ -161,7 +161,7 @@ while True:
         q = []
         for i in cmd[2]: q.append(eval(i))
         navigate(cmd[1], q, int(cmd[3]) )
-        port.write(bytes(msg+'_OK', encoding='ascii'))
+        port.write(bytes('OK\r', encoding='ascii'))
 
 
     if msg == 'INIT':
@@ -185,19 +185,10 @@ while True:
         try:
             speed = -int(rcv[1])
         except BaseException as e:
-            port.write(bytes(msg+'_ERR', encoding='ascii'))
+            port.write(bytes('ER\r', encoding='ascii'))
             print('err 0', e)
             continue
 
+        direct(speed, XY)    
 
-     #   print('MRAB', MOTORS_A)
-        direct(speed, XY)
-        #direct(-speed, MOTORS_B)
-        port.write(bytes(msg+'_SLEEP', encoding='ascii'))
-       # print(msg+'_SLEEP')
-        #
-
-#time.sleep(3)
-       # direct(-speed, MOTORS_A)
-        print(msg+'_OK')
-        port.write(bytes(msg+'_OK', encoding='ascii'))
+        port.write(bytes('OK\r', encoding='ascii'))
