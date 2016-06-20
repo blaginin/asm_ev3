@@ -50,7 +50,7 @@ insideinit()
 #AB = [MOTORS_A, MOTORS_B]
 #CD = [MOTORS_C, MOTORS_D]
 
-allm = [B, C, D]
+allm = [B, C, D, A]
 #42-35
 USE_SP = 3
 LUCK = D
@@ -111,11 +111,12 @@ def deviation_list(lst):
 def direct(speed, motors, NNIUD=1):
     hh = [[] for i in range(len(motors))]
     stopn = 0
-    print("DIRECT MOTORS", motors)
+#    print("DIRECT MOTORS", motors)
     for motor in motors:
         print(motor.port)
         motor.run_forever(speed_sp=0)
         motor.write_value('estop', '0')
+        motor.stop()
         motor.write_value('reset', '1')
         motor.run_forever(speed)
     while True:
@@ -151,9 +152,9 @@ port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
 print('START LISTEN')
 while True:
     msg = readlineCR(port).strip().upper()
-
+   
     if len(msg) == 0: continue
-
+    print('RCV', msg)
     if msg == 'PING':
        port.write(bytes('OK\r', encoding='ascii'))
 
@@ -181,7 +182,7 @@ while True:
 
     if msg == 'INIT':
         insideinit()
-        direct(50, allm.copy())
+        direct(0, allm.copy())
 
   #      for motor in allm: motor.write_value('estop', '0')
         print('INIT DONE')
