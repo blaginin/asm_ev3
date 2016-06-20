@@ -5,8 +5,15 @@ import os
 import ev3.ev3dev as ev3dev
 import sys
 #+ = close
-color = ev3dev.LegoSensor(port=4)
-button = ev3dev.LegoSensor(port=3)
+try:
+    color = ev3dev.LegoSensor(port=4)
+    color.mode = 'COL-COLOR'
+except BaseException:
+    pass
+
+try:
+    button = ev3dev.LegoSensor(port=3)
+except BaseException: pass
 
 
 
@@ -49,7 +56,7 @@ USE_SP = 3
 LUCK = D
 
 
-color.mode = 'COL-COLOR'
+#color.mode = 'COL-COLOR'
 N_COLORS = 10
 N_COLORS_STOP = 0.9
 CLAW_MOTOR = C
