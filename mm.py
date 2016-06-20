@@ -122,7 +122,13 @@ def direct(speed, motors, NNIUD=1):
     while True:
         for ind, motor in enumerate(motors):
             if motor is None: continue
-            hh[ind].append(motor.position)
+
+            while True:
+                try:
+                    hh[ind].append(motor.position)
+                    break
+                except BaseException: pass
+
             if len(hh[ind]) > USE_SP:
                 del(hh[ind][0])
                 ans = deviation_list(hh[ind])
