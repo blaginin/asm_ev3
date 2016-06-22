@@ -1,2 +1,3 @@
 #/usr/bin/bash
-if !(pidof python3 mm.py >/dev/null) then sudo python3 /home/asm_ev3/mm.py; fi
+cd /home/asm_ev3
+if ![/bin/ps awx | /bin/grep mm.py] then  /bin/python3 mm.py; fi

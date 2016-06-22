@@ -170,8 +170,18 @@ port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
 print('START LISTEN')
 while True:
     msg = " ".join(readlineCR(port).strip().upper().split())
-   
+    fl =open('/sys/class/leds/ev3:green:left/brightness', 'w+')# echo "0" > ./brightness
+    fl.write('0')
+    fl.close()
+
+
+
     if len(msg) == 0: continue
+    
+
+    fl =open('/sys/class/leds/ev3:green:left/brightness', 'w+')# echo "0" > ./brightness
+    fl.write('255')
+    fl.close()
 
     screen.reset()
     screen.draw.text((0,0), msg)
@@ -231,3 +241,4 @@ while True:
         direct(speed, XY)    
 
         port.write(bytes('OK\r', encoding='ascii'))
+
