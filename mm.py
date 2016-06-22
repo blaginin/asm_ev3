@@ -89,7 +89,7 @@ def navigate(x, motors, speed):
         if len(colorarray) < N_COLORS: continue
         del(colorarray[0])
         if colorarray.count(x)/N_COLORS >= N_COLORS_STOP:
-            print('COLOR DONE')
+#            print('COLOR DONE')
             for motor in motors:
                 motor.write_value('stop_mode', 'hold')
                 motor.stop()
@@ -117,7 +117,7 @@ def direct(speed, motors, NNIUD=1):
     stopn = 0
 #    print("DIRECT MOTORS", motors)
     for motor in motors:
-        print(motor.port)
+ #       print(motor.port)
         motor.run_forever(speed_sp=0)
         motor.write_value('estop', '0')
         motor.stop()
@@ -149,7 +149,7 @@ def readlineCR(port):
     while True:
         ch = port.read()
         ch = ch.decode(encoding='ascii')
-        print(ch, end='')
+  #      print(ch, end='')
         rv += ch
         if ch=='\r' or ch=='':
             return rv
@@ -174,7 +174,7 @@ while True:
        port.write(bytes('OK\r', encoding='ascii'))
 
     if msg.startswith('FREE'):
-        print('FREE', msg)
+   #     print('FREE', msg)
        # os.system('sudo bash /home/mstop.sh')
         motor = eval(msg.split('_')[1])
         motor.write_value('estop', '1')
@@ -183,7 +183,7 @@ while True:
         continue
 
     if msg.startswith('NAVIGATE'):
-        print('NAVIG', msg)
+    #    print('NAVIG', msg)
         cmd = msg.split('_')
         if cmd[1] == 'NONE': 
             push()
