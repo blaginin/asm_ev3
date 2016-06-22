@@ -124,6 +124,14 @@ def direct(speed, motors, NNIUD=1):
         motor.write_value('reset', '1')
         motor.run_forever(speed)
     while True:
+        try:
+            if button.value0:
+                for motor in motors: 
+                    if motor is not None: motor.write_value('stop_mode', 'hold')
+                
+                return
+        except BaseException: pass
+
         for ind, motor in enumerate(motors):
             if motor is None: continue
 
