@@ -3,8 +3,12 @@ import time
 from ev import ev
 import os
 import ev3.ev3dev as ev3dev
+import ev3dev as evCORE
 import sys
 #+ = close
+
+screen = ev3CORE.Lcd()
+
 try:
     color = ev3dev.LegoSensor(port=4)
     color.mode = 'COL-COLOR'
@@ -127,7 +131,7 @@ def direct(speed, motors, NNIUD=1):
                 try:
                     hh[ind].append(motor.position)
                     break
-                except BaseException: pass
+                except BaseException as e: print('YO', e)
 
             if len(hh[ind]) > USE_SP:
                 del(hh[ind][0])
@@ -160,6 +164,11 @@ while True:
     msg = readlineCR(port).strip().upper()
    
     if len(msg) == 0: continue
+
+    screen.reset()
+    screen.draw.text((0,0), msg)
+    screen.update()
+
     print('RCV', msg)
     if msg == 'PING':
        port.write(bytes('OK\r', encoding='ascii'))
