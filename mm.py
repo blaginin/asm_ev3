@@ -75,7 +75,7 @@ def run(speed, motors):
 
 
 def push():
-    for i in range(4*2):
+    for i in range(2*2):
         direct(90 +  (-180)*((i+1)%2), [LUCK], NNIUD=0.4)
         time.sleep(0.5)
 
