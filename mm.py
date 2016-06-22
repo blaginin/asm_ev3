@@ -100,7 +100,7 @@ def navigate(x, motors, speed):
             while not button.value0: pass
             for motor in motors: motor.stop()
             return
-        print('NO', colorarray)
+#        print('NO', colorarray)
 
         
 
