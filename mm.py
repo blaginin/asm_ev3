@@ -7,7 +7,7 @@ import ev3dev as evCORE
 import sys
 #+ = close
 
-screen = ev3CORE.Lcd()
+screen = evCORE.Lcd()
 
 try:
     color = ev3dev.LegoSensor(port=4)
