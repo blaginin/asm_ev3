@@ -64,7 +64,7 @@ LUCK = D
 N_COLORS = 10
 N_COLORS_STOP = 0.9
 CLAW_MOTOR = C
-m_mark = {"N":1, "M":5, "G":2, "P":3, "S":4}
+m_mark = {"N":1, "M":5, "G":2, "P":3, "S":6}
 
 
 def run(speed, motors):
