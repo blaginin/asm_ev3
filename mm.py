@@ -161,7 +161,7 @@ port = serial.Serial("/dev/tty_in1", baudrate=115200, timeout=3.0)
 
 print('START LISTEN')
 while True:
-    msg = readlineCR(port).strip().upper()
+    msg = " ".join(readlineCR(port).strip().upper().split())
    
     if len(msg) == 0: continue
 
@@ -200,11 +200,11 @@ while True:
         direct(0, allm.copy())
 
   #      for motor in allm: motor.write_value('estop', '0')
-        print('INIT DONE')
+#        print('INIT DONE')
         continue
  
     rcv = msg.split('_')
-    print(rcv)
+ #   print(rcv)
 
  
 
